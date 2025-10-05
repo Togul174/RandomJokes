@@ -12,7 +12,7 @@ async function scrapeTest() {
     }
     let anekData = [];
 
-    for (let i = 1; topicWithAJoke[i] != undefined; i++) {
+    topicWithAJoke.forEach((item) => {
         let result = {
             id: null,
             text: null,
@@ -24,43 +24,47 @@ async function scrapeTest() {
 
         // ID
 
-        let idMatch = topicWithAJoke[i].match(/id="(\d+)"/);
-        result.id = idMatch[1];
+        let idMatch = item.match(/id="(\d+)"/);
+        result.id = idMatch ? idMatch[1] : null;
 
         // Текст
 
-        let textMatch = topicWithAJoke[i].match(/<div class="text">(.*?)<\/div>/);
+        let textMatch = item.match(/<div class="text">(.*?)<\/div>/);
        
 
-        let cleanText = textMatch[1]
+        result.text = textMatch ? textMatch[1]
                 .replace(/<br\s*\/?>/gi, '\n')
                 .replace(/<\/?[^>]+(>|$)/g, '')
-                .trim();
-        result.text = cleanText;
+                .trim() : null;
     
         // Дата
         
-        let dateMatch = topicWithAJoke[i].match(/<p class="title"><a [^>]+>([\d.]+)<\/a><\/p>/);
-        result.date = dateMatch[1];
+        let dateMatch = item.match(/<p class="title"><a [^>]+>([\d.]+)<\/a><\/p>/);
+        result.date = dateMatch ? dateMatch[1] : null;
 
         // Рейтинг
 
-        let ratingMatch = topicWithAJoke[i].match(/<div class="rates"[^>]*data-r="(\d+)/);
-        result.rating = ratingMatch[1];
+        let ratingMatch = item.match(/<div class="rates"[^>]*data-r="(\d+)/);
+        result.rating = ratingMatch ? ratingMatch[1] : null;
 
         // Тэги
 
-        let tagsMatch = topicWithAJoke[i].match(/<div class="tags"><a[^>]*>([^<]+)<\/a><\/div>/);
+        let tagsMatch = item.match(/<div class="tags"><a[^>]*>([^<]+)<\/a><\/div>/);
         result.tags = tagsMatch ? tagsMatch[1] : [];
 
         // Автор
 
-        let authorMatch = topicWithAJoke[i].match(/<a class="auth"[^>]*>([^<]+)<\/a>/);
-        result.author = authorMatch[1];
+        let authorMatch = item.match(/<a class="auth"[^>]*>([^<]+)<\/a>/);
+        result.author = authorMatch ? authorMatch[1] : null;
 
         anekData.push(result);
-    }
+    });
     return anekData;
 }
 
-console.log(scrapeTest());
+let finish = async () => {
+    const data = await scrapeTest();
+    console.log(data);
+};
+
+finish();
